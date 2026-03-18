@@ -67,7 +67,11 @@ Optional arguments:
   - `2` -> `GHOST-aurora`
   - `3` -> `Unknown`
   - `U` -> remove label
-- Enable **Show only unlabeled images** to speed up manual review.
+- Use filters on the left to show only the categories you want:
+  - **Show Unlabeled**
+  - **Show Non-GHOST**
+  - **Show GHOST**
+  - **Show Unknown**
 
 Labels are saved automatically after each action to the session file.
 

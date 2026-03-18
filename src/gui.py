@@ -76,9 +76,22 @@ class LabelingMainWindow(QMainWindow):
         self.day_list.currentItemChanged.connect(self._on_day_changed)
         left_layout.addWidget(self.day_list)
 
-        self.unlabeled_only_box = QCheckBox("Show only unlabeled images")
-        self.unlabeled_only_box.toggled.connect(self._on_filter_changed)
-        left_layout.addWidget(self.unlabeled_only_box)
+        left_layout.addWidget(QLabel("Filters"))
+        self.show_unlabeled_box = QCheckBox("Show Unlabeled")
+        self.show_unlabeled_box.toggled.connect(self._on_filter_changed)
+        left_layout.addWidget(self.show_unlabeled_box)
+
+        self.show_non_box = QCheckBox("Show Non-GHOST")
+        self.show_non_box.toggled.connect(self._on_filter_changed)
+        left_layout.addWidget(self.show_non_box)
+
+        self.show_ghost_box = QCheckBox("Show GHOST")
+        self.show_ghost_box.toggled.connect(self._on_filter_changed)
+        left_layout.addWidget(self.show_ghost_box)
+
+        self.show_unknown_box = QCheckBox("Show Unknown")
+        self.show_unknown_box.toggled.connect(self._on_filter_changed)
+        left_layout.addWidget(self.show_unknown_box)
 
         left_layout.addWidget(QLabel("Files in selected day"))
         self.file_list = QListWidget()
@@ -189,9 +202,33 @@ class LabelingMainWindow(QMainWindow):
 
     def _visible_images(self, day: str) -> list[str]:
         paths = self.index.by_day[day]
-        if not self.unlabeled_only_box.isChecked():
+        active_filters = self._active_filters()
+        if not active_filters:
             return paths
-        return [path for path in paths if self.session.get_label(path) is None]
+        filtered: list[str] = []
+        for path in paths:
+            label = self.session.get_label(path)
+            if label is None and "unlabeled" in active_filters:
+                filtered.append(path)
+            elif label == LABEL_NON and "non" in active_filters:
+                filtered.append(path)
+            elif label == LABEL_GHOST and "ghost" in active_filters:
+                filtered.append(path)
+            elif label == LABEL_UNKNOWN and "unknown" in active_filters:
+                filtered.append(path)
+        return filtered
+
+    def _active_filters(self) -> set[str]:
+        filters: set[str] = set()
+        if self.show_unlabeled_box.isChecked():
+            filters.add("unlabeled")
+        if self.show_non_box.isChecked():
+            filters.add("non")
+        if self.show_ghost_box.isChecked():
+            filters.add("ghost")
+        if self.show_unknown_box.isChecked():
+            filters.add("unknown")
+        return filters
 
     def _on_day_changed(self, current: QListWidgetItem | None, _previous: QListWidgetItem | None) -> None:
         if current is None:
@@ -352,7 +389,11 @@ class LabelingMainWindow(QMainWindow):
         self._refresh_day_list()
         self.current_images = self._visible_images(self.current_day)
 
-        if self.unlabeled_only_box.isChecked():
+        if self.show_unlabeled_box.isChecked() and not (
+            self.show_non_box.isChecked()
+            or self.show_ghost_box.isChecked()
+            or self.show_unknown_box.isChecked()
+        ):
             if not self.current_images:
                 self._render_empty_day(self.current_day or "")
                 self._refresh_file_list(preferred_path=None)
