@@ -1,6 +1,6 @@
 # GHOST-Aurora Labeling GUI
 
-![Aurora Labeling App](labelling_app.png)
+<img src="labelling_app.png" alt="Aurora Labeling App" width="320" />
 
 Desktop application to manually label all-sky camera images as either:
 - `GHOST-aurora`
