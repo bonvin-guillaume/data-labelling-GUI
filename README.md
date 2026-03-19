@@ -48,7 +48,7 @@ python app.py --data-root "/path/to/data_root"
 If your source is an SMB URL (example: `smb://birkeland.unis.no/KHO/Sony/2024/12/14/...`), first mount it in Finder, then use the mounted local path (usually under `/Volumes/...`), e.g.:
 
 ```bash
-python app.py --data-root "/Volumes/KHO/Sony/2024/12"
+python app.py --data-root "/Volumes/KHO/Sony/Quicklooks/2020/01/03"
 ```
 
 Optional arguments:
